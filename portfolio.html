@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Baskar Ravi | Full Stack Developer</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;700;800&display=swap" rel="stylesheet">
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #040814;
+            --bg-color-alt: #0a1128;
+            --text-main: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent: #00f0ff;
+            --accent-glow: rgba(0, 240, 255, 0.3);
+            --accent-alt: #7000ff;
+            --glass-bg: rgba(10, 17, 40, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.05);
+            --font-main: 'Inter', sans-serif;
+            --font-headings: 'Outfit', sans-serif;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Scroll Progress Bar */
+        #scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-alt));
+            z-index: 1002;
+            transition: width 0.1s ease-out;
+            border-radius: 0 4px 4px 0;
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        /* Mouse Glow Effect */
+        #mouse-glow {
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(0, 240, 255, 0.15) 0%, rgba(112, 0, 255, 0.1) 40%, transparent 70%);
+            border-radius: 50%;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: -2;
+            filter: blur(40px);
+            opacity: 0;
+            transition: opacity 1s ease;
+        }
+
+        /* Canvas Background */
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--bg-color-alt);
+            border: 1px solid var(--accent-alt);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+
+        /* Preloader */
+        #preloader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: var(--bg-color);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.8s ease-out, visibility 0.8s;
+        }
+
+        .loader-content {
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .glow-ring {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            border-top-color: var(--accent);
+            border-bottom-color: var(--accent-alt);
+            animation: spin 1.5s linear infinite;
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .glow-ring::before {
+            content: '';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            border-right-color: var(--accent);
+            border-left-color: var(--accent-alt);
+            animation: spin-reverse 2s linear infinite;
+        }
+
+        .loader-text {
+            position: absolute;
+            font-family: var(--font-headings);
+            font-size: 1.2rem;
+            color: var(--accent);
+            letter-spacing: 2px;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes spin-reverse { 0% { transform: rotate(360deg); } 100% { transform: rotate(0deg); } }
+        @keyframes pulse {
+            0%, 100% { Math: 0.5; text-shadow: none; opacity: 0.5; }
+            50% { opacity: 1; text-shadow: 0 0 10px var(--accent); }
+        }
+
+        body.loaded #preloader {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4 {
+            font-family: var(--font-headings);
+            font-weight: 700;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 4rem;
+            text-align: center;
+            position: relative;
+            display: inline-block;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--accent), transparent);
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .highlight {
+            color: var(--accent);
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .gradient-text {
+            background: linear-gradient(90deg, var(--accent), #b53cff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Layout & Utilities */
+        .page-section {
+            padding: 100px 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            transition: var(--transition);
+        }
+
+        .glass-card-hover:hover {
+            transform: translateY(-5px);
+            border-color: rgba(0, 240, 255, 0.2);
+            box-shadow: 0 12px 40px 0 rgba(0, 240, 255, 0.1);
+        }
+
+        /* Animations */
+        .reveal-hidden {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+            will-change: opacity, transform;
+        }
+
+        .reveal-hidden.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Custom Navbar Overrides */
+        #custom-navbar {
+            padding: 1.5rem 0;
+            transition: var(--transition);
+            background: transparent;
+        }
+
+        #custom-navbar.scrolled {
+            padding: 1rem 0;
+            background: rgba(4, 8, 20, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+        }
+
+        .navbar-brand.logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: var(--text-main);
+        }
+
+        .navbar-brand.logo:hover {
+            color: var(--text-main);
+        }
+
+        /* Custom hamburger styling for Bootstrap */
+        .navbar-toggler {
+            border: none;
+        }
+        .navbar-toggler:focus {
+            box-shadow: none;
+        }
+        .navbar-toggler-icon {
+            background-image: none !important;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            width: 30px;
+        }
+        .navbar-toggler-icon span {
+            display: block;
+            width: 25px;
+            height: 2px;
+            background-color: var(--accent);
+            transition: var(--transition);
+        }
+
+        .custom-nav-link {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-secondary) !important;
+            position: relative;
+            transition: var(--transition);
+            margin: 0 0.5rem;
+        }
+
+        .custom-nav-link:hover,
+        .custom-nav-link.active {
+            color: var(--accent) !important;
+        }
+
+        .custom-nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--accent);
+            transition: width 0.3s ease;
+        }
+
+        .custom-nav-link:hover::after,
+        .custom-nav-link.active::after {
+            width: 100%;
+        }
+
+        /* Hero Section */
+        .hero-greeting {
+            color: var(--accent);
+            font-family: var(--font-headings);
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            display: block;
+            letter-spacing: 2px;
+        }
+
+        .hero-name {
+            font-size: clamp(3rem, 8vw, 5rem);
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            color: var(--text-main);
+        }
+
+        .hero-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            color: var(--text-secondary);
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+
+        .typewriter-wrapper {
+            display: inline-block;
+        }
+
+        .typewriter {
+            overflow: hidden;
+            border-right: .15em solid var(--accent);
+            white-space: nowrap;
+            margin: 0 auto;
+            letter-spacing: .15em;
+            animation: typing 3.5s steps(40, end), blink-caret .75s step-end infinite;
+        }
+
+        @keyframes typing { from { width: 0 } to { width: 100% } }
+        @keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: var(--accent); } }
+
+        .btn-custom {
+            display: inline-block;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-family: var(--font-headings);
+            font-weight: 600;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            background: transparent;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.1);
+            text-decoration: none;
+        }
+
+        .btn-custom:before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-custom:hover:before {
+            left: 100%;
+        }
+
+        .btn-custom:hover {
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+            background: rgba(0, 240, 255, 0.05);
+            color: var(--accent);
+        }
+
+        /* Skills Tags */
+        .tag-pill {
+            padding: 0.5rem 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            font-size: 0.85rem;
+            color: var(--accent);
+            transition: var(--transition);
+            cursor: default;
+        }
+
+        .tag-pill:hover {
+            background: rgba(0, 240, 255, 0.1);
+            border-color: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 2px;
+            height: 100%;
+            background: var(--glass-border);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -6px;
+            top: 0;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--bg-color);
+            border: 2px solid var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .timeline-content ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .timeline-content li {
+            position: relative;
+            padding-left: 1.5rem;
+            margin-bottom: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .timeline-content li::before {
+            content: '▹';
+            position: absolute;
+            left: 0;
+            color: var(--accent);
+        }
+
+        /* Project Cards */
+        .project-card {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-alt));
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s ease;
+        }
+
+        .project-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .project-tech-badge {
+            font-family: var(--font-headings);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+        }
+
+        /* Form */
+        .form-control-custom {
+            background: rgba(255, 255, 255, 0.02) !important;
+            border: 1px solid var(--glass-border) !important;
+            color: var(--text-main) !important;
+            transition: var(--transition);
+        }
+
+        .form-control-custom:focus {
+            outline: none;
+            border-color: var(--accent) !important;
+            background: rgba(0, 240, 255, 0.02) !important;
+            box-shadow: none !important;
+        }
+
+        .form-control-custom::placeholder {
+            color: var(--text-secondary);
+        }
+
+        /* Social Links */
+        .social-links a {
+            color: var(--text-secondary);
+            transition: var(--transition);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .social-links a:hover {
+            color: var(--accent);
+            transform: translateY(-3px);
+        }
+
+        .social-links .icon {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+            margin-right: 8px;
+        }
+
+        footer {
+            border-top: 1px solid var(--glass-border);
+            color: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            .navbar-collapse {
+                background: var(--bg-color-alt);
+                padding: 1rem;
+                border-radius: 8px;
+                border: 1px solid var(--glass-border);
+                margin-top: 1rem;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            }
+            .timeline::before { left: 15px; }
+            .timeline-item { padding-left: 40px; }
+            .timeline-item::before { left: 9px; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="loader-content">
+            <div class="glow-ring"></div>
+            <span class="loader-text">Loading</span>
+        </div>
+    </div>
+
+    <!-- Mouse Glow Effect -->
+    <div id="mouse-glow"></div>
+
+    <!-- Scroll Progress Bar -->
+    <div id="scroll-progress"></div>
+
+    <!-- Particle Background -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- Navigation (Bootstrap Navbar) -->
+    <nav class="navbar navbar-expand-lg fixed-top" id="custom-navbar">
+        <div class="container">
+            <a class="navbar-brand logo" href="#">BASKAR<span class="highlight">.</span></a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+                aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                <div class="navbar-toggler-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarContent">
+                <ul class="navbar-nav gap-2 gap-lg-4 mt-3 mt-lg-0">
+                    <li class="nav-item"><a class="nav-link custom-nav-link" href="#about">About</a></li>
+                    <li class="nav-item"><a class="nav-link custom-nav-link" href="#experience">Experience</a></li>
+                    <li class="nav-item"><a class="nav-link custom-nav-link" href="#projects">Projects</a></li>
+                    <li class="nav-item"><a class="nav-link custom-nav-link" href="#education">Education</a></li>
+                    <li class="nav-item"><a class="nav-link custom-nav-link" href="#contact">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main ContentWrapper -->
+    <main>
+        
+        <!-- Hero Section -->
+        <section id="hero" class="page-section d-flex align-items-center vh-100">
+            <div class="container reveal-hidden">
+                <div class="row">
+                    <div class="col-lg-9 col-xl-8 mt-5 mt-md-0">
+                        <span class="hero-greeting">Hi, I am</span>
+                        <h1 class="hero-name">Baskar Ravi.</h1>
+                        
+                        <!-- Desktop Typwriter -->
+                        <h2 class="hero-title text-start mb-4 d-none d-sm-block">
+                            <span class="gradient-text typewriter-wrapper">
+                                <span class="typewriter">Full Stack Developer.</span>
+                            </span>
+                        </h2>
+                        <!-- Mobile Fallback -->
+                        <h2 class="hero-title text-start mb-4 d-block d-sm-none">
+                            <span class="gradient-text">Full Stack Developer.</span>
+                        </h2>
+
+                        <p class="fs-5 text-secondary mb-5" style="max-width: 600px;">
+                            Results-driven .NET Developer with 4+ years of experience in designing, developing, and deploying scalable web applications. Passionate about building secure, user-friendly solutions with optimized performance.
+                        </p>
+                        <a href="#contact" class="btn-custom">Let's Connect</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About & Skills Section -->
+        <section id="about" class="page-section pt-5 pt-md-0">
+            <div class="container">
+                <h2 class="section-title reveal-hidden">About & Expertise</h2>
+                <div class="row g-5 align-items-center">
+                    
+                    <!-- About Text -->
+                    <div class="col-lg-6 reveal-hidden">
+                        <div class="glass-card glass-card-hover h-100">
+                            <p class="fs-6 text-secondary mb-3">I am a technically proficient Full Stack Developer specializing in the <strong class="text-white">.NET ecosystem and Oracle DB</strong>. With strong expertise in front-end technologies like JavaScript, HTML, and CSS, I build modern, scalable web applications.</p>
+                            <p class="fs-6 text-secondary mb-3">My career focuses on the full software development lifecycle (SDLC), utilizing Agile methodologies. I am adept at integrating complex third-party APIs (like Razorpay and UAE Pass), optimizing backend performance, and implementing secure, seamless authentication tools.</p>
+                            <p class="fs-6 text-secondary mb-0">Always pushing constraints to adopt best practices, resulting in resilient and scalable architectural approaches.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Skills -->
+                    <div class="col-lg-6 reveal-hidden">
+                        <div class="d-flex flex-column gap-4">
+                            
+                            <!-- Skill Group 1 -->
+                            <div class="glass-card glass-card-hover">
+                                <h4 class="text-white fs-5 mb-3">Backend & DB</h4>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="tag-pill">.NET Core</span>
+                                    <span class="tag-pill">ASP.NET MVC</span>
+                                    <span class="tag-pill">Web API</span>
+                                    <span class="tag-pill">C#</span>
+                                    <span class="tag-pill">ADO.NET</span>
+                                    <span class="tag-pill">Entity Framework Core</span>
+                                    <span class="tag-pill">Dapper</span>
+                                    <span class="tag-pill">Oracle DB</span>
+                                    <span class="tag-pill">PostgreSQL</span>
+                                    <span class="tag-pill">MySQL</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Skill Group 2 -->
+                            <div class="glass-card glass-card-hover">
+                                <h4 class="text-white fs-5 mb-3">Frontend</h4>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="tag-pill">JavaScript</span>
+                                    <span class="tag-pill">Angular</span>
+                                    <span class="tag-pill">HTML5/CSS3</span>
+                                    <span class="tag-pill">jQuery</span>
+                                    <span class="tag-pill">AJAX</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Skill Group 3 -->
+                            <div class="glass-card glass-card-hover">
+                                <h4 class="text-white fs-5 mb-3">Tools & Integrations</h4>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="tag-pill">Git</span>
+                                    <span class="tag-pill">Azure Fundamentals</span>
+                                    <span class="tag-pill">Visual Studio 2022</span>
+                                    <span class="tag-pill">Razorpay</span>
+                                    <span class="tag-pill">UAE Pass</span>
+                                    <span class="tag-pill">AG-GRID</span>
+                                    <span class="tag-pill">OCR Reading</span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Experience Section -->
+        <section id="experience" class="page-section pt-5 pt-md-0">
+            <div class="container">
+                <h2 class="section-title reveal-hidden">Work Experience</h2>
+                <div class="row justify-content-center">
+                    <div class="col-12 col-lg-10 col-xl-8">
+                        <div class="timeline">
+                            
+                            <!-- Timeline 1 -->
+                            <div class="timeline-item reveal-hidden">
+                                <span class="d-block text-info fw-bold mb-2">Dec 2023 – Present</span>
+                                <h3 class="fs-4 mb-1">Software Developer | .NET Core</h3>
+                                <div class="text-secondary fw-medium mb-3">Ainsurtech · Thiruvananthapuram, Kerala</div>
+                                <div class="glass-card glass-card-hover timeline-content">
+                                    <ul class="mb-0">
+                                        <li>Developed responsive master layouts for insurance modules, significantly enhancing UI/UX.</li>
+                                        <li>Implemented CRUD operations utilizing AG-GRID for dynamic and efficient data visualization.</li>
+                                        <li>Architected and integrated .NET Core Web API for secure EID authentication flows.</li>
+                                        <li>Improved backend system performance through proactive system health checks and monitoring.</li>
+                                        <li>Successfully integrated Razorpay payment gateway for reliable transaction processing.</li>
+                                        <li>Implemented UAE Pass integration for secure, streamlined document sharing and OAuth authentication.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <!-- Timeline 2 -->
+                            <div class="timeline-item reveal-hidden">
+                                <span class="d-block text-info fw-bold mb-2">Nov 2021 – Dec 2023</span>
+                                <h3 class="fs-4 mb-1">Junior Software Developer | Frontend & .NET</h3>
+                                <div class="text-secondary fw-medium mb-3">Ainsurtech · Thiruvananthapuram, Kerala</div>
+                                <div class="glass-card glass-card-hover timeline-content">
+                                    <ul class="mb-0">
+                                        <li>Developed responsive interfaces for Motor, Medical, and Travel insurance modules with dynamic forms using jQuery, AJAX, and JSON.</li>
+                                        <li>Built scheme calculations with jQuery math functions, optimizing performance using Debounce and Throttle techniques.</li>
+                                        <li>Contributed to an insurance portal using .NET Core, C#, Entity Framework, and Dapper.</li>
+                                        <li>Developed a B2C portal featuring a Renewal module and Tariff Engine, enhancing customer self-service capabilities.</li>
+                                        <li>Led UI optimization efforts using Lighthouse and Webpack, implemented Lazy Loading and integrated an EID-MRZ reader for OCR identity verification.</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="page-section pt-5 pt-md-0">
+            <div class="container">
+                <h2 class="section-title reveal-hidden">Key Projects</h2>
+                <div class="row g-4 flex-wrap">
+                    
+                    <div class="col-md-6 col-xl-6 reveal-hidden">
+                        <div class="glass-card project-card">
+                            <h3 class="fs-4 text-white mb-3">ADIC Portal Development</h3>
+                            <p class="text-secondary flex-grow-1">Developed a modular web portal with API-driven architecture, UAE Pass login, and Motor API transactions for real-time data exchange in the B2C module.</p>
+                            <div class="d-flex flex-wrap gap-2 mt-3">
+                                <span class="project-tech-badge text-secondary">.NET</span>
+                                <span class="project-tech-badge text-secondary">API Architecture</span>
+                                <span class="project-tech-badge text-secondary">B2C</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-xl-6 reveal-hidden">
+                        <div class="glass-card project-card">
+                            <h3 class="fs-4 text-white mb-3">ILAF Translation API</h3>
+                            <p class="text-secondary flex-grow-1">Built a Python Flask-based API for English-Arabic translation using NLP and Deep Translator, significantly improving accuracy and resolving complex binding issues.</p>
+                            <div class="d-flex flex-wrap gap-2 mt-3">
+                                <span class="project-tech-badge text-secondary">Python</span>
+                                <span class="project-tech-badge text-secondary">Flask</span>
+                                <span class="project-tech-badge text-secondary">NLP</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-xl-6 reveal-hidden">
+                        <div class="glass-card project-card">
+                            <h3 class="fs-4 text-white mb-3">OCR Extraction API</h3>
+                            <p class="text-secondary flex-grow-1">Developed a high-accuracy OCR Extraction API with Python, NLP, and Levenshtein distance theory to extract and manipulate text securely from official documents like Mulkiya and Driving Licenses.</p>
+                            <div class="d-flex flex-wrap gap-2 mt-3">
+                                <span class="project-tech-badge text-secondary">Python</span>
+                                <span class="project-tech-badge text-secondary">OCR</span>
+                                <span class="project-tech-badge text-secondary">Algorithms</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-xl-6 reveal-hidden">
+                        <div class="glass-card project-card">
+                            <h3 class="fs-4 text-white mb-3">UAE Pass Integration</h3>
+                            <p class="text-secondary flex-grow-1">Integrated UAE Pass using OAuth 2.0 with JWT tokens and deployed it for secure data fetching via API, enabling seamless identity verification globally.</p>
+                            <div class="d-flex flex-wrap gap-2 mt-3">
+                                <span class="project-tech-badge text-secondary">OAuth 2.0</span>
+                                <span class="project-tech-badge text-secondary">JWT</span>
+                                <span class="project-tech-badge text-secondary">Security</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- Education Section -->
+        <section id="education" class="page-section pt-5 pt-md-0">
+            <div class="container">
+                <h2 class="section-title reveal-hidden">Education Profile</h2>
+                <div class="row justify-content-center">
+                    <div class="col-lg-8">
+                        <div class="d-flex flex-column gap-4">
+                            
+                            <div class="glass-card glass-card-hover d-flex flex-column flex-md-row justify-content-between align-items-md-center border-start border-4 border-info reveal-hidden">
+                                <div class="mb-3 mb-md-0">
+                                    <h3 class="fs-5 text-white mb-1">B.E. Electronics & Comm. Engineering</h3>
+                                    <p class="text-secondary mb-0">Hindusthan College of Engineering</p>
+                                </div>
+                                <div class="text-info fw-bold fs-5">2020</div>
+                            </div>
+                            
+                            <div class="glass-card glass-card-hover d-flex flex-column flex-md-row justify-content-between align-items-md-center border-start border-4 border-info reveal-hidden">
+                                <div class="mb-3 mb-md-0">
+                                    <h3 class="fs-5 text-white mb-1">12th Grade</h3>
+                                    <p class="text-secondary mb-0">Rasi International School</p>
+                                </div>
+                                <div class="text-info fw-bold fs-5">2016</div>
+                            </div>
+                            
+                            <div class="glass-card glass-card-hover d-flex flex-column flex-md-row justify-content-between align-items-md-center border-start border-4 border-info reveal-hidden">
+                                <div class="mb-3 mb-md-0">
+                                    <h3 class="fs-5 text-white mb-1">10th Grade</h3>
+                                    <p class="text-secondary mb-0">Rasi International School</p>
+                                </div>
+                                <div class="text-info fw-bold fs-5">2014</div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="page-section pt-5 pt-md-0 pb-5">
+            <div class="container text-center">
+                <h2 class="section-title reveal-hidden">Get In Touch</h2>
+                
+                <div class="row justify-content-center">
+                    <div class="col-md-8 col-lg-6">
+                        <p class="text-secondary mb-5 reveal-hidden">Whether you have a question or just want to say hi, I'll try my best to get back to you! I'm currently looking for new opportunities.</p>
+                        
+                        <form class="glass-card text-start mb-5 reveal-hidden" onsubmit="event.preventDefault(); alert('Request sent! Implement backend.');">
+                            <div class="mb-4">
+                                <input type="text" class="form-control form-control-lg form-control-custom" placeholder="Name" required aria-label="Name">
+                            </div>
+                            <div class="mb-4">
+                                <input type="email" class="form-control form-control-lg form-control-custom" placeholder="Email" required aria-label="Email">
+                            </div>
+                            <div class="mb-4">
+                                <textarea class="form-control form-control-lg form-control-custom" rows="5" placeholder="Message" required aria-label="Message"></textarea>
+                            </div>
+                            <button type="submit" class="btn-custom">Send Message</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Footer / Connect Links -->
+                <div class="row justify-content-center reveal-hidden">
+                    <div class="col-12 d-flex flex-column flex-md-row justify-content-center gap-3 gap-md-5 social-links my-4">
+                        <a href="mailto:baskarbozz89@gmail.com" aria-label="Email Address">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" /></svg>
+                            <span>baskarbozz89@gmail.com</span>
+                        </a>
+                        <a href="tel:+919043379573" aria-label="Phone Number">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z" /></svg>
+                            <span>+91 9043379573</span>
+                        </a>
+                        <a href="https://www.linkedin.com/in/baskarravi-a428751a1" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn Profile">
+                            <svg class="icon" viewBox="0 0 24 24"><path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-1.85 0-2.58 1-3 1.66v-1.4h-3.3v10h3.3v-5.59c0-1.49.28-2.94 2.14-2.94 1.84 0 1.84 1.72 1.84 3v5.53h3.28m-11.85-10h-3.3v10h3.3v-10m-1.65-4.25a1.92 1.92 0 0 0-2 1.92c0 1.06.86 1.92 2 1.92a1.92 1.92 0 0 0 2-1.92c0-1.06-.86-1.92-2-1.92z" /></svg>
+                            <span>LinkedIn</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="py-4">
+        <div class="container text-center">
+            <p class="mb-0 fs-6">&copy; 2024 Baskar Ravi. Designed with Bootstrap 5.0 & Glassmorphism.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Interactive JavaScript -->
+    <script>
+        // 1. Interactive Particle Background (Canvas)
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        let particlesArray = [];
+
+        class Particle {
+            constructor(x, y, vx, vy, size, color) {
+                this.x = x;
+                this.y = y;
+                this.vx = vx;
+                this.vy = vy;
+                this.size = size;
+                this.color = color;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+
+            update() {
+                if (this.x > canvas.width || this.x < 0) this.vx = -this.vx;
+                if (this.y > canvas.height || this.y < 0) this.vy = -this.vy;
+
+                this.x += this.vx;
+                this.y += this.vy;
+                this.draw();
+            }
+        }
+
+        function initCanvas() {
+            particlesArray = [];
+            let numberOfParticles = (canvas.height * canvas.width) / 10000;
+            if (numberOfParticles > 200) numberOfParticles = 200;
+
+            for (let i = 0; i < numberOfParticles; i++) {
+                let size = (Math.random() * 2) + 0.5;
+                let x = (Math.random() * (innerWidth - size * 2) + size * 2);
+                let y = (Math.random() * (innerHeight - size * 2) + size * 2);
+                let vx = (Math.random() * 1) - 0.5;
+                let vy = (Math.random() * 1) - 0.5;
+                let color = 'rgba(0, 240, 255, 0.2)';
+
+                particlesArray.push(new Particle(x, y, vx, vy, size, color));
+            }
+        }
+
+        function animateCanvas() {
+            requestAnimationFrame(animateCanvas);
+            ctx.clearRect(0, 0, innerWidth, innerHeight);
+
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+            }
+            connectParticles();
+        }
+
+        function connectParticles() {
+            for (let a = 0; a < particlesArray.length; a++) {
+                for (let b = a; b < particlesArray.length; b++) {
+                    let distance = ((particlesArray[a].x - particlesArray[b].x) * (particlesArray[a].x - particlesArray[b].x))
+                        + ((particlesArray[a].y - particlesArray[b].y) * (particlesArray[a].y - particlesArray[b].y));
+                    if (distance < (canvas.width / 10) * (canvas.height / 10)) {
+                        let opacityValue = 1 - (distance / 20000);
+                        ctx.strokeStyle = `rgba(0, 240, 255, ${opacityValue * 0.15})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                        ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = innerWidth;
+            canvas.height = innerHeight;
+            initCanvas();
+        });
+
+        initCanvas();
+        animateCanvas();
+
+        // 2. Intersection Observer (Scroll Yield Reveal)
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.15
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('show');
+                    observer.unobserve(entry.target); 
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal-hidden').forEach(el => observer.observe(el));
+
+        // 3. Navbar scroll effect
+        const navbar = document.getElementById('custom-navbar');
+        const sections = document.querySelectorAll('section');
+        const navItems = document.querySelectorAll('.custom-nav-link');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (pageYOffset >= (sectionTop - sectionHeight / 3)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navItems.forEach(a => {
+                a.classList.remove('active');
+                if (a.getAttribute('href').includes(current)) {
+                    a.classList.add('active');
+                }
+            });
+        });
+
+        // Close Bootstrap collapse on click
+        document.querySelectorAll('.navbar-nav .nav-link').forEach(link => {
+            link.addEventListener('click', () => {
+                const navbarCollapse = document.getElementById('navbarContent');
+                if(navbarCollapse.classList.contains('show')) {
+                    const bsCollapse = bootstrap.Collapse.getInstance(navbarCollapse);
+                    bsCollapse.hide();
+                }
+            });
+        });
+
+        // 4. Scroll Progress Indicator
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('scroll-progress').style.width = scrolled + '%';
+        });
+
+        // 5. Mouse Glow Tracker
+        const mouseGlow = document.getElementById('mouse-glow');
+        window.addEventListener('mousemove', (e) => {
+            mouseGlow.style.opacity = '1';
+            mouseGlow.animate({
+                left: `${e.clientX}px`,
+                top: `${e.clientY}px`
+            }, { duration: 3000, fill: "forwards" });
+        });
+        document.body.addEventListener('mouseleave', () => {
+            mouseGlow.style.opacity = '0';
+        });
+
+        // 6. Project Cards 3D Tilt
+        const projectCards = document.querySelectorAll('.project-card');
+        projectCards.forEach(card => {
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = ((y - centerY) / centerY) * -8;
+                const rotateY = ((x - centerX) / centerX) * 8;
+                
+                card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
+                card.style.transition = 'none';
+                card.style.zIndex = '10';
+            });
+            
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = '';
+                card.style.transition = 'all 0.5s ease';
+                card.style.zIndex = '1';
+            });
+        });
+
+        // 7. Preloader Event
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.body.classList.add('loaded');
+            }, 1000); 
+        });
+
+    </script>
+</body>
+
+</html>
